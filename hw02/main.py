@@ -1,7 +1,5 @@
 import os
-import subprocess
-
-from pdflatex import PDFLaTeX
+from astbuilder.main import create_picture
 
 
 def normalize_input(input_str):
@@ -17,19 +15,26 @@ def generate_table(input_str):
 
 
 def generate_picture():
-    return "\\begin{center}\n\\includegraphics{universe}\n\\end{center}\n"
+    create_picture()
+    return "\\begin{center}\n\\includegraphics[width=\\textwidth]{artifacts/example.png}\n\\end{center}\n"
 
 
-def generate_pdf(input_str):
+def generate_tex(input_str):
     table = generate_table(input_str)
     picture = generate_picture()
-    with open("artifacts\\result.tex", "w") as text_file:
+    with open("artifacts/result.tex", "w") as text_file:
         text_file.write(
-            f"\\documentclass{{article}}\n\\usepackage{{graphicx}}\n\\graphicspath{{{{./images/}}}}\n\\begin{{document}}\n"
+            f"\\documentclass{{article}}\n\\usepackage{{graphicx}}\n\\begin{{document}}\n"
             + table
             + picture
             + "\\end{document}")
-    os.system("pdflatex result.tex")
+
+
+def generate_pdf(input_str):
+    generate_tex(input_str)
+    os.system("pdflatex -halt-on-error -output-directory artifacts artifacts/result.tex")
+    os.system("rm artifacts/result.aux artifacts/result.log artifacts/example.png")
+
 
 if __name__ == '__main__':
     generate_pdf([["cell1", "cell2", "cell3"], ["cell1", "cell2"], ["cell1", "cell2", "cell3"]])

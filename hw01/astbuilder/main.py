@@ -119,9 +119,9 @@ def create_picture():
     v.visit(ast_object)
     G = v.graph
     p = nx.drawing.nx_pydot.to_pydot(G)
-    if not os.path.exists("../artifacts"):
-        os.mkdir("../artifacts")
-    p.write_png('../artifacts/example.png')
+    if not os.path.exists("artifacts"):
+        os.mkdir("artifacts")
+    p.write_png('artifacts/example.png')
 
 
 if __name__ == '__main__':
