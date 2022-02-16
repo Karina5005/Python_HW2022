@@ -1,4 +1,6 @@
 import ast
+import os
+
 import networkx as nx
 
 
@@ -36,6 +38,9 @@ class AstGraphGenerator(object):
 
     def visit_Module(self, node):
         self.visit(node.body[0])
+
+    def visit_Index(self, node):
+        return str(node)
 
     def visit_FunctionDef(self, node):
         self.graph.add_node(str(node), label=f'Function({node.name})', color='red')
@@ -91,7 +96,7 @@ class AstGraphGenerator(object):
     def visit_Subscript(self, node):
         self.graph.add_node(str(node), label=f'Subscript', color='green')
         self.add_edge(str(node), self.visit(node.value), 'value')
-        self.add_edge(str(node), self.visit(node.slice), 'slice')
+        self.add_edge(str(node), self.visit(node.slice.value), 'slice')
         return [str(node)]
 
     def visit_Return(self, node):
@@ -103,15 +108,21 @@ class AstGraphGenerator(object):
         raise NotImplementedError
 
 
-if __name__ == '__main__':
+def create_picture():
     ast_object = ast.parse("""def fib(n):
-        res = [0] * n
-        res[0] = res[1] = 1
-        for i in range(2, n):
-            res[i] = res[i-1] + res[i-2]
-        return res""")
+            res = [0] * n
+            res[0] = res[1] = 1
+            for i in range(2, n):
+                res[i] = res[i-1] + res[i-2]
+            return res""")
     v = AstGraphGenerator()
     v.visit(ast_object)
     G = v.graph
     p = nx.drawing.nx_pydot.to_pydot(G)
-    p.write_png('artifacts/example.png')
+    if not os.path.exists("../artifacts"):
+        os.mkdir("../artifacts")
+    p.write_png('../artifacts/example.png')
+
+
+if __name__ == '__main__':
+    create_picture()
