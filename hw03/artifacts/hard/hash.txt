@@ -1,0 +1,4 @@
+Hash AB:
+11
+hash CD:
+29
